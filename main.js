@@ -32,6 +32,11 @@ new Vue({
             deep: true
         }
     },
+    // ライフサイクルのメソッドはmethodsの中に記述しない
+    created() {
+        // todoのインスタンス生成時に自動でfetch()を使いtodosを取得する
+        this.todos = todoStorage.fetch()
+    },
     methods: {
         doAdd: function (event, value) {
             // refで名前付けをした要素を参照
