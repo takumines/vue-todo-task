@@ -1,7 +1,7 @@
-var STORAGE_KEY = 'todos-vuejs-demo'
-var todoStorage = {
+let STORAGE_KEY = 'todos-vuejs-demo'
+let todoStorage = {
     fetch: function () {
-        var todos = JSON.parse(
+        let todos = JSON.parse(
             localStorage.getItem(STORAGE_KEY) || '[]'
         )
         todos.forEach(function (todo, index) {
@@ -20,7 +20,28 @@ new Vue({
     // データの初期値を宣言
     // data オプション直下のデータは後から追加ができないため
     data: {
-        todos: []
+        todos: [],
+        options: [
+            { value: -1, label: 'すべて' },
+            { value: 0, label: '作業中' },
+            { value: 1, label: '完了' }
+        ],
+        // 初期値を-1にして状態をすべてにする
+        current: -1
+    },
+    // computed オプションはデータから別の新しいデータを作ることができる
+    computed: {
+        computedTodos: function () {
+            return this.todos.filter(function (el) {
+                return this.current < 0 ? true : this.current === el.state
+            }, this)
+        },
+
+        labels() {
+            return this.options.reduce(function (a, b) {
+                return Object.assign(a, {[b.value]: b.label})
+            }, {})
+        }
     },
     watch: {
         todos: {
@@ -40,7 +61,7 @@ new Vue({
     methods: {
         doAdd: function (event, value) {
             // refで名前付けをした要素を参照
-            var comment = this.$refs.comment
+            let comment = this.$refs.comment
             console.log(comment.value);
 
             if (!comment.value.length) {
@@ -55,6 +76,17 @@ new Vue({
 
             // フォーム要素の初期化
             comment.value = ''
+        },
+        // 状態変更の処理
+        doChangeState: function (item) {
+            item.state = !item.state ? 1 : 0
+        },
+        // 削除処理
+        doRemove: function (item) {
+            // 削除対象のtodoのindexを取得
+            let index = this.todos.indexOf(item)
+            // spliceメソッドで第一引数に指定したindexを1つ削除する
+            this.todos.splice(index, 1)
         }
     }
 })
